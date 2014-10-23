@@ -130,14 +130,35 @@ public class EnvInjectVariableGetter {
         return null;
     }
 
-    public Map<String, String> getEnvVarsPreviousSteps(AbstractBuild build, EnvInjectLogger logger) throws IOException, InterruptedException, EnvInjectException {
+    public Map<String, String> getEnvVarsPreviousSteps(AbstractBuild build, EnvInjectLogger logger) throws IOException,
+            InterruptedException, EnvInjectException
+    {
+        return getEnvVarsPreviousSteps(build, logger, true);
+    }
+
+    public Map<String, String> getEnvVarsPreviousSteps(AbstractBuild build, EnvInjectLogger logger, boolean failOnEnvironmentError)
+            throws IOException, InterruptedException, EnvInjectException
+    {
         Map<String, String> result = new HashMap<String, String>();
 
         List<Environment> environmentList = build.getEnvironments();
         if (environmentList != null) {
             for (Environment e : environmentList) {
                 if (e != null) {
-                    e.buildEnvVars(result);
+                    try {
+                        e.buildEnvVars(result);
+                    }
+                    catch (Throwable t) {
+                        if (failOnEnvironmentError) {
+                            if (t instanceof Error)
+                                throw (Error) t;
+                            if (t instanceof RuntimeException)
+                                throw (RuntimeException) t;
+                            // Impossible but will cover anyway
+                            throw new RuntimeException(t);
+                        }
+                        logger.error("Environment " + e + " failed to build environment variables: " + t);
+                    }
                 }
             }
         }

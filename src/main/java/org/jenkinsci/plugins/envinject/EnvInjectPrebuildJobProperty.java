@@ -129,7 +129,7 @@ public class EnvInjectPrebuildJobProperty<T extends Job<?, ?>> extends JobProper
             assert isOn();
 
             //Init infra env vars
-            Map<String, String> previousEnvVars = variableGetter.getEnvVarsPreviousSteps(build, logger);
+            Map<String, String> previousEnvVars = variableGetter.getEnvVarsPreviousSteps(build, logger, false);
             Map<String, String> infraEnvVarsNode = new LinkedHashMap<String, String>(previousEnvVars);
             Map<String, String> infraEnvVarsMaster = new LinkedHashMap<String, String>(previousEnvVars);
 
