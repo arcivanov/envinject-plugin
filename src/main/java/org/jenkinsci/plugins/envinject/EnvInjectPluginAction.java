@@ -1,11 +1,13 @@
 package org.jenkinsci.plugins.envinject;
 
+import com.google.common.collect.Maps;
 import hudson.EnvVars;
 import hudson.model.AbstractBuild;
 import hudson.model.EnvironmentContributingAction;
 import org.jenkinsci.lib.envinject.EnvInjectAction;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Gregory Boissinot
@@ -17,7 +19,13 @@ public class EnvInjectPluginAction extends EnvInjectAction implements Environmen
     }
 
     public Object getTarget() {
-        return new EnvInjectVarList(envMap);
+        return new EnvInjectVarList(Maps.transformEntries(envMap,
+                new Maps.EntryTransformer<String, String, String>() {
+                    public String transformEntry(String key, String value) {
+                        final Set<String> sensibleVars = getSensibleVariables();
+                        return sensibleVars != null && sensibleVars.contains(key) ? "********" : value;
+                    }
+                }));
     }
 
     public void buildEnvVars(AbstractBuild<?, ?> build, EnvVars env) {

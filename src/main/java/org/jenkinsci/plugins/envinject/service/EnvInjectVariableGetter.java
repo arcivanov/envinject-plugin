@@ -4,6 +4,7 @@ import hudson.EnvVars;
 import hudson.Util;
 import hudson.matrix.MatrixRun;
 import hudson.model.*;
+import hudson.model.Hudson.MasterComputer;
 import hudson.util.LogTaskListener;
 import org.jenkinsci.lib.envinject.EnvInjectException;
 import org.jenkinsci.lib.envinject.EnvInjectLogger;
@@ -40,10 +41,16 @@ public class EnvInjectVariableGetter {
         //test if there is at least one executor
         if (computer != null) {
             result = computer.getEnvironment().overrideAll(result);
-            Node n = computer.getNode();
-            if (n != null)
+            if(computer instanceof MasterComputer) {
+                result.put("NODE_NAME", "master");
+            } else {
                 result.put("NODE_NAME", computer.getName());
-            result.put("NODE_LABELS", Util.join(n.getAssignedLabels(), " "));
+            }
+            
+            Node n = computer.getNode();
+            if (n != null) {
+                result.put("NODE_LABELS", Util.join(n.getAssignedLabels(), " "));
+            }
         }
 
         String rootUrl = Hudson.getInstance().getRootUrl();

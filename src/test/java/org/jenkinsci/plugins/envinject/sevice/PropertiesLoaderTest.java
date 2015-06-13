@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.any;
 
 /**
  * @author Gregory Boissinot
@@ -22,12 +21,12 @@ public class PropertiesLoaderTest {
 
     @Test(expected = NullPointerException.class)
     public void nullFile() throws Exception {
-        propertiesLoader.getVarsFromPropertiesFile(null, any(Map.class));
+        propertiesLoader.getVarsFromPropertiesFile(null, new HashMap<String, String>());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void notExistFile() throws Exception {
-        propertiesLoader.getVarsFromPropertiesFile(new File("not exist"), any(Map.class));
+        propertiesLoader.getVarsFromPropertiesFile(new File("not exist"), new HashMap<String, String>());
     }
 
     @Test
@@ -36,14 +35,14 @@ public class PropertiesLoaderTest {
         Map<String, String> currentEnvVars = new HashMap<String, String>();
         Map<String, String> gatherVars = propertiesLoader.getVarsFromPropertiesFile(emptyFile, currentEnvVars);
         assertNotNull(gatherVars);
-        assertTrue(gatherVars.size() == 0);
+        assertEquals(0, gatherVars.size());
     }
 
     //-- Content
 
     @Test(expected = NullPointerException.class)
     public void nullContent() throws Exception {
-        propertiesLoader.getVarsFromPropertiesContent(null, any(Map.class));
+        propertiesLoader.getVarsFromPropertiesContent(null, new HashMap<String, String>());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -51,7 +50,7 @@ public class PropertiesLoaderTest {
         Map<String, String> currentEnvVars = new HashMap<String, String>();
         Map<String, String> gatherVars = propertiesLoader.getVarsFromPropertiesContent(new String(), currentEnvVars);
         assertNotNull(gatherVars);
-        assertTrue(gatherVars.size() == 0);
+        assertEquals(0, gatherVars.size());
     }
 
     //--Both
@@ -70,7 +69,7 @@ public class PropertiesLoaderTest {
         String content = "SOMEKEY=SOMEVALUE";
         Map<String, String> gatherVars = gatherEnvVars(fromFile, content, new HashMap<String, String>());
         assertNotNull(gatherVars);
-        assertTrue(gatherVars.size() == 1);
+        assertEquals(1, gatherVars.size());
         assertEquals("SOMEVALUE", gatherVars.get("SOMEKEY"));
     }
 
@@ -88,7 +87,7 @@ public class PropertiesLoaderTest {
         String content = "KEY1=VALUE1\nKEY2=VALUE2\nKEY3=VALUE3";
         Map<String, String> gatherVars = gatherEnvVars(fromFile, content, new HashMap<String, String>());
         assertNotNull(gatherVars);
-        assertTrue(gatherVars.size() == 3);
+        assertEquals(3, gatherVars.size());
         assertEquals("VALUE1", gatherVars.get("KEY1"));
         assertEquals("VALUE2", gatherVars.get("KEY2"));
         assertEquals("VALUE3", gatherVars.get("KEY3"));
@@ -108,7 +107,7 @@ public class PropertiesLoaderTest {
         String content = "KEY1 =VALUE1\nKEY2=VALUE2\nKEY3=VALUE3 ";
         Map<String, String> gatherVars = gatherEnvVars(fromFile, content, new HashMap<String, String>());
         assertNotNull(gatherVars);
-        assertTrue(gatherVars.size() == 3);
+        assertEquals(3, gatherVars.size());
         assertEquals("VALUE1", gatherVars.get("KEY1"));
         assertEquals("VALUE2", gatherVars.get("KEY2"));
         assertEquals("VALUE3", gatherVars.get("KEY3"));
@@ -129,7 +128,7 @@ public class PropertiesLoaderTest {
         String content = "KEY1=line1\\\nline2\nKEY2= line1 \\\n line2 \nKEY3=line1\\\n\\\nline3";
         Map<String, String> gatherVars = gatherEnvVars(fromFile, content, new HashMap<String, String>());
         assertNotNull(gatherVars);
-        assertTrue(gatherVars.size() == 3);
+        assertEquals(3, gatherVars.size());
 
         // Values should be trimmed at start & end, otherwise whitespace & newlines should be kept
         assertEquals("line1\nline2", gatherVars.get("KEY1"));
@@ -155,7 +154,7 @@ public class PropertiesLoaderTest {
 
         Map<String, String> gatherVars = gatherEnvVars(fromFile, content, currentEnvVars);
         assertNotNull(gatherVars);
-        assertTrue(gatherVars.size() == 3);
+        assertEquals(3, gatherVars.size());
         assertEquals("NEW_VALUE1", gatherVars.get("KEY1"));
         assertEquals("VALUE2", gatherVars.get("KEY2"));
         assertEquals("NEW_VALUE3\\otherContent", gatherVars.get("KEY3"));
